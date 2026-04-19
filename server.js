@@ -10,9 +10,9 @@ app.use(express.json());
 app.post('/chat', async (req, res) => {
     try {
         const message = req.body.message;
-        const prompt = req.body.prompt; // HTML에서 보낸 긴 규칙을 받습니다.
+        const prompt = req.body.prompt; 
 
-        // 서버 로그에 찍히게 설정 (이제 Render 로그에서 확인 가능!)
+        // 서버 로그 확인용
         console.log("사용자 메시지:", message);
         console.log("전달된 프롬프트:", prompt);
 
@@ -25,7 +25,7 @@ app.post('/chat', async (req, res) => {
             body: JSON.stringify({
                 model: "gpt-4o-mini", 
                 messages: [
-                    { role: "system", content: prompt }, // 수영님의 규칙 적용
+                    { role: "system", content: prompt },
                     { role: "user", content: message }
                 ]
             })
@@ -40,5 +40,6 @@ app.post('/chat', async (req, res) => {
     }
 });
 
+// Render를 위한 포트 설정 (10000번 필수)
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`));
