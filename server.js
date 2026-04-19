@@ -9,12 +9,12 @@ app.use(express.json());
 // 상담 API 엔드포인트
 app.post('/chat', async (req, res) => {
     try {
-        const message = req.body.message;
+        // [수정] HTML에서 보낸 'history' 배열을 가져옵니다.
+        const history = req.body.history; 
         const prompt = req.body.prompt; 
 
-        // 서버 로그 확인용
-        console.log("사용자 메시지:", message);
-        console.log("전달된 프롬프트:", prompt);
+        // 서버 로그 확인용 (사용자가 이전에 무슨 말을 했는지 배열로 보입니다)
+        console.log("대화 기록 수신:", history);
 
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
@@ -26,7 +26,7 @@ app.post('/chat', async (req, res) => {
                 model: "gpt-4o-mini", 
                 messages: [
                     { role: "system", content: prompt },
-                    { role: "user", content: message }
+                    ...history // [핵심] HTML에서 받은 대화 목록을 여기에 그대로 펼쳐넣습니다.
                 ]
             })
         });
@@ -40,6 +40,6 @@ app.post('/chat', async (req, res) => {
     }
 });
 
-// Render를 위한 포트 설정 (10000번 필수)
+// 포트 설정
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`));
