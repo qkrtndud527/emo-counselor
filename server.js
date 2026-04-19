@@ -3,20 +3,13 @@ import cors from 'cors';
 import fetch from 'node-fetch';
 
 const app = express();
-
-// CORS 설정 및 JSON 파싱
 app.use(cors());
 app.use(express.json());
 
 app.post('/chat', async (req, res) => {
     try {
-        const { history, prompt } = req.body;
-
-        // OpenAI로 보낼 메시지 구성
-        const messages = [
-            { role: "system", content: prompt },
-            ...history
-        ];
+        const history = req.body.history || [];
+        const prompt = req.body.prompt || "다정한 상담사로 대답해줘.";
 
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
@@ -26,25 +19,16 @@ app.post('/chat', async (req, res) => {
             },
             body: JSON.stringify({
                 model: "gpt-4o-mini",
-                messages: messages
+                messages: [{ role: "system", content: prompt }, ...history]
             })
         });
 
         const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.error?.message || "OpenAI API 호출 실패");
-        }
-
         res.json(data);
-
     } catch (error) {
-        console.error("서버 에러:", error);
         res.status(500).json({ error: error.message });
     }
 });
 
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-    console.log(`서버가 포트 ${PORT}에서 작동 중입니다.`);
-});
+app.listen(PORT, () => console.log(`서버 작동 중: ${PORT}`));
